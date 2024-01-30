@@ -6,6 +6,11 @@ class UserController extends User
 {
     public function getUsers()
     {
-        echo $this->users();
+        echo json_encode(parent::getUsers());
+    }
+
+    public function addUser($data)
+    {
+        echo json_encode(parent::addUser($data));
     }
 }
