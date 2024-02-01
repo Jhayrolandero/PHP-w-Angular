@@ -2,10 +2,10 @@
 class Database
 {
 
-    private $host = "localhost";
-    private $user = "root";
-    private $pass = "";
-    private $dbname = "idunno";
+    private $host = "sql6.freesqldatabase.com";
+    private $user = "sql6681253";
+    private $pass = "QCSiBBnunC";
+    private $dbname = "sql6681253";
 
     protected function connect()
     {
