@@ -3,3 +3,7 @@
 ```sh
 composer install
 ```
+
+## RESTful API
+
+- Auth by JWT
