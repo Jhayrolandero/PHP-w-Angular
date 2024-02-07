@@ -2,15 +2,38 @@
 
 require_once __DIR__ . "/../model/User.model.php";
 
+/**
+ * 
+ * User Controller Class
+ * 
+ * Used for communicating with model
+ */
 class UserController extends User
 {
-    public function getUsers()
+    /**
+     * @param string $tablename
+     *  name of table to be queried
+     *  
+     * @param string $condition
+     *  condition for query
+     * 
+     * @return array
+     *  return payload object containing information about response
+     */
+    public function getRecords($tableName, $condition = null)
     {
-        echo json_encode(parent::getUsers());
+        return parent::getRecords($tableName, $condition);
     }
 
-    public function addUser($data)
+    /**
+     * @param array $data
+     *  Accept json data for POST  
+     * 
+     * @return array
+     *  return payload object containing information about response
+     */
+    public function addRecord($tableName, $data)
     {
-        echo json_encode(parent::addUser($data));
+        return 
     }
 }
