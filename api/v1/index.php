@@ -10,7 +10,7 @@ if (isset($_REQUEST["request"])) {
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
-        echo json_encode($user->getRecords($request[0]));
+        echo json_encode($user->index());
         break;
 
     case "POST":

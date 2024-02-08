@@ -8,10 +8,10 @@ set_time_limit(120);
 class Database
 {
 
-    private $host = "sql6.freesqldatabase.com";
-    private $user = "sql6681253";
-    private $pass = "QCSiBBnunC";
-    private $dbname = "sql6681253";
+    private $host = "mysql-penacony.alwaysdata.net";
+    private $user = "penacony_guest";
+    private $pass = "honkaistarrail";
+    private $dbname = "penacony_db";
 
     protected function connect()
     {
