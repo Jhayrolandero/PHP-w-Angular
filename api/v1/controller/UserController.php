@@ -16,6 +16,10 @@ class UserController extends Controller
     public function index()
     {
         $user = new User();
-        return parent::findAll($user->table, null);
+        echo json_encode(parent::findAll($user->table, null));
+    }
+
+    public function store() {
+        
     }
 }
