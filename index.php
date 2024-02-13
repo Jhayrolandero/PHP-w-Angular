@@ -12,6 +12,7 @@ $router = new Router($_SERVER["REQUEST_METHOD"], $request[0]);
 
 // ("path", "callback")
 $router->get("user", "UserController@index");
+$router->get("user/{id}/order/{id}", "UserController@index");
 $router->post("user", "UserController@store");
 
 $router->run();

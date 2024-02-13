@@ -33,6 +33,10 @@ class Model extends Database
         return $this->sendPayload(null, 'failed', $result['message'], $result['code']);
     }
 
+    protected function addRecord($tableName, $column) {
+
+        
+    }
 
 
     /**
