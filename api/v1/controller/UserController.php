@@ -13,13 +13,19 @@ require_once __DIR__ . "/../model/User.model.php";
 class UserController extends Controller
 {
 
-    public function index()
+    private $user;
+    function __construct()
     {
-        $user = new User();
-        echo json_encode(parent::findAll($user->table, null));
+        $this->user = new User;
     }
 
-    public function store() {
-        
+    public function index()
+    {
+        echo json_encode(parent::findAll($this->user->table, null));
+    }
+
+    public function store($data)
+    {
+        echo json_encode($data);
     }
 }

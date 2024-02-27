@@ -1,12 +1,18 @@
 <?php
 spl_autoload_register(function ($class_name) {
-    include  __DIR__ . "/../api/v1/controller/" . $class_name . '.php';
+    $filepath = __DIR__ . "/../api/v1/controller/" . $class_name . '.php';
 
-    // Check to see whether the include declared the class
-    if (!class_exists($class_name, false)) {
-        throw new LogicException("Unable to load class: $class_name");
+    try {
+        if (file_exists($filepath)) {
+            include $filepath;
+        }
+    } catch (Exception $e) {
+        // Handle autoload exceptions here
+        http_response_code(500);
+        echo json_encode($e->getMessage());
     }
 });
+
 // require "./dummy.php";
 class Router
 {
@@ -17,7 +23,33 @@ class Router
      */
     private $routes = [];
 
+
+    /**
+     * List of error message
+     * 
+     * @var
+     */
     private $errmsg = [];
+
+
+    /**
+     * List of accepted methods
+     * 
+     * @var
+     */
+
+    private $list_method = ["GET", "POST", "DELETE", "PUT"];
+
+
+    private $requestMethod;
+
+    private $URIpattern;
+
+    function __construct($requestMethod, $URIpattern)
+    {
+        $this->requestMethod = $requestMethod;
+        $this->URIpattern = $URIpattern;
+    }
     /**
      * URI Path
      * @param string $URI
@@ -26,8 +58,6 @@ class Router
      * @param mixed $callback
      * 
      */
-
-
     public function get($URI, $callback)
     {
         $this->addRoutes("GET", $URI, $callback);
@@ -88,51 +118,94 @@ class Router
      */
     private function addRoutes($method, $URI, $callback)
     {
+
+        if (!in_array(strtoupper($method), $this->list_method)) {
+            $this->err(404, "Invalid method");
+        }
         $this->routes[$method][$URI] = $callback;
     }
 
-    public function run($method, $URI)
+
+    /**
+     * 
+     * 
+     * @param string $method
+     * 
+     * @param string $URI
+     */
+
+    public function run()
     {
-        $callback = $this->match($method, $URI);
+        $callback = $this->match($this->requestMethod, $this->URIpattern);
 
-        if ($callback !== null) {
-            $request = explode('@', $callback);
+        $http = explode('@', $callback);
 
-            if (count($request) === 2) {
-                $class = $request[0];
-                $method = $request[1];
+        if (count($http) < 2) {
+            $this->err(404, "Invalid Callback Format");
+        }
 
-                if (class_exists($class)) {
-                    $obj = new $class();
+        $class = $http[0];
+        $method = $http[1];
 
-                    if (method_exists($obj, $method)) {
-                        $obj->$method();
-                    } else {
-                        echo "Method $method does not exist in class $class.";
-                    }
-                } else {
-                    echo "Class $class does not exist.";
-                }
-            } else {
-                echo "Invalid callback format.";
-            }
-        } else {
-            echo json_encode($this->errmsg);
+        if (!class_exists($class)) {
+            $this->err(404, "Class $class is not found");
+        }
+
+        $controller = new $class();
+        $callable = [$controller, $method];
+
+        if (!is_callable($callable)) {
+            $this->err(404, "Callback $method is not callable");
+        }
+
+        switch ($this->requestMethod) {
+            case "POST":
+                $data = json_decode(file_get_contents("php://input"));
+                $controller->$method($data);
+                break;
+            case "GET":
+                $controller->$method();
+                break;
         }
     }
 
-    private function handle($callback)
-    {
-    }
+
+    /**
+     * 
+     * 
+     * @param string $method
+     * 
+     * @param string $URI
+     */
     private function match($method, $URI)
     {
-        if (isset($this->routes[$method][$URI])) {
+        $callback = $this->routes[$method][$URI];
+        if (isset($callback)) {
+            if (empty($callback)) {
+                $this->err(404, "No Callback found");
+            }
             return $this->routes[$method][$URI];
         } else {
             array_push($this->errmsg, "Path doesn't exist");
         }
     }
-    private function clean($URI)
+
+    /**
+     * 
+     * @param int $code
+     * 
+     * @param string $message
+     */
+    private function err($code, $message)
     {
+        http_response_code($code);
+        array_push($this->errmsg, $message);
+        echo json_encode([
+            "Status" => "error",
+            "Message" => $this->errmsg
+        ]);
+
+        $this->errmsg = [];
+        exit();
     }
 }
